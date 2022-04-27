@@ -160,7 +160,19 @@ I = m*L**2 / 12
 
 # Função de controle: Ação nula.
 def funcao_controle_1(sensores):
-    acao = 0
+    
+    #Polos com estabilidade fina para o disturbio com polos em p = (-80, -165, -1.5, -2) no Matlab
+    K = np.array([-2761, -3273, -11460, -2352])
+    
+    #Polos com estabilidade fina para o disturbio com polos em P = [-4, -3.9719+j,-3.9719-j,-3.9719] no Matlab
+    #Próximo do limiar de instabilidade (polos exatos com deslocamento no plano complexo)
+    #K = np.array([-18.5846, -18.1254, -88.7634, -22.9593])
+    
+    #ganhos obtidos com os polos estipulados por análise da reação ao degrau
+    K = K*(-1)#operação da fórmula
+    
+    acao = np.array(((sensores[0]-env.xRef)*K[0]+sensores[1]*K[1]+sensores[2]*K[2]+sensores[3]*K[3]))
+    
     return acao
 
 
@@ -183,7 +195,6 @@ def funcao_controle_3(sensores):
         acao = -1.0
     return acao
 
-
 # Cria o ambiente de simulação.
 env = InvertedPendulum(0.50)
 
@@ -197,7 +208,7 @@ while True:
         break
     
     # Calcula a ação de controle.
-    acao = funcao_controle_3(sensores)  # É ESSA A FUNÇÃO QUE VOCÊS DEVEM PROJETAR.
+    acao = funcao_controle_1(sensores)  # É ESSA A FUNÇÃO QUE VOCÊS DEVEM PROJETAR.
     
     # Aplica a ação de controle.
     sensores = env.step(acao)
