@@ -167,7 +167,7 @@ def funcao_controle_1(sensores):
     #Polos com estabilidade fina para o disturbio com polos em P = [-4, -3.9719+j,-3.9719-j,-3.9719] no Matlab
     #Próximo do limiar de instabilidade (polos exatos com deslocamento no plano complexo)
     #K = np.array([-18.5846, -18.1254, -88.7634, -22.9593])
-    
+                                                                                 
     #ganhos obtidos com os polos estipulados por análise da reação ao degrau
     K = K*(-1)#operação da fórmula
     
@@ -182,7 +182,7 @@ def funcao_controle_2(sensores):
     acao = 2*np.random.randn() - 1
     return acao
 
-
+                
 # Função de controle.
 def funcao_controle_3(sensores):
     # Controle intuitivo.

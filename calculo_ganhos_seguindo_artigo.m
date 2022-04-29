@@ -11,7 +11,7 @@ sysSS_ma = ss(A, B, C, D); %objeto no espaço de estados
 co = ctrb(sysSS_ma); %matriz de controlabilidade
 controlabilidade_reduzida = rank(co); %verifica se a dimensão de A é igual 
                                       %à pose da matriz de controlabilidade
-                                      %como pose = 4 e A(4x4), é
+                                      %como posto = 4 e A(4x4), é
                                       %controlavel.
 
 %LQR
@@ -31,9 +31,10 @@ A_lqr3=A-B*K3; %matriz A para malha fechada
 %Place (polos)
 p=[-80,-165,-1.5,-2]; %fino pra caramba
 
-%p=[-80,-165,-1.5-0.5j,-1.5+0.5j];%Polos obtidos empiricamente para atingir um controle 
-                     %estável a distúrbios
+%p=[-80,-125,-2.0-0.25j,-2.0+0.25j];%Polos obtidos empiricamente para atingir um controle 
+                     %estável a distúrbios com conjugados
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% AQUI FOI A QUE DEU CERTO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 K4=place(A,B,p);
 A_pl=A-B*K4; %matriz A para malha fechada
 
@@ -78,5 +79,6 @@ sysSS_mf = ss(A_pl_calculado, B, C, D); %Criando o sistema em malha fechada
 sysSS_mf_empirico = ss(A_pl, B, C, D);
     
 %step(sysSS_ma);
-%step(sysSS_mf);
+step(sysSS_mf);
 step(sysSS_mf_empirico);
+%plot(sysSS_mf_empirico);
