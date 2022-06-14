@@ -214,11 +214,24 @@ X['PoucoPositivo'] = fuzz.trimf( x, [0, 0.325, 0.75])
 X['MuitoPositivo'] = fuzz.trapmf(x, [0.5, 0.75, 1, 1])
 
 #TA FUNCIONANDO
-X_P['Negativo'] = fuzz.trimf(x_p, [-50, -47, -0])
-X_P['Zero']     = fuzz.trimf(x_p, [-10, 0, 10])
+# X_P['Negativo'] = fuzz.trimf(x_p, [-50, -47, -0])
+# X_P['Zero']     = fuzz.trimf(x_p, [-10, 0, 10])
+# X_P['Positivo'] = fuzz.trimf(x_p, [0, 47, 50])
+
+#tá bacana
+X_P['Negativo'] = fuzz.trimf(x_p, [-50, -47, 0])
+X_P['Zero']     = fuzz.trimf(x_p, [-0.1, 0, 0.1])
 X_P['Positivo'] = fuzz.trimf(x_p, [0, 47, 50])
 
 #TÁ FUNCIONANDO
+# THETA['MuitoNegativo'] = fuzz.trapmf(theta, [-1, -1, -0.75, -0.5])
+# THETA['MedioNegativo'] = fuzz.trimf( theta, [-0.75, -0.5, -0.25])
+# THETA['PoucoNegativo'] = fuzz.trimf( theta, [-0.50, -0.25, 0])
+# THETA['Zero']          = fuzz.trapmf(theta, [-0.2, -0.1, 0.1, 0.2])
+# THETA['PoucoPositivo'] = fuzz.trimf( theta, [0 , 0.25, 0.5])
+# THETA['MedioPositivo'] = fuzz.trimf( theta, [0.25, 0.5, 0.75])
+# THETA['MuitoPositivo'] = fuzz.trapmf(theta, [0.5, 0.75, 1, 1])
+
 THETA['MuitoNegativo'] = fuzz.trapmf(theta, [-1, -1, -0.75, -0.5])
 THETA['MedioNegativo'] = fuzz.trimf( theta, [-0.75, -0.5, -0.25])
 THETA['PoucoNegativo'] = fuzz.trimf( theta, [-0.50, -0.25, 0])
@@ -235,15 +248,25 @@ THETA_P['PoucoPositivo'] = fuzz.trimf( theta_p, [2, 5, 8])
 THETA_P['MuitoPositivo'] = fuzz.trapmf(theta_p, [7,12,20,20])
 
 #TÁ FUNCIONDANDO
-FORCA['ExtremoNegativo'] = fuzz.trapmf(forca, [-1000, -1000, -800, -600])
+# FORCA['ExtremoNegativo'] = fuzz.trapmf(forca, [-1000, -1000, -800, -600])
+# FORCA['MuitoNegativo']   = fuzz.trimf( forca, [-800, -600, -400])
+# FORCA['MedioNegativo']   = fuzz.trimf( forca, [-600, -400, -200])
+# FORCA['PoucoNegativo']   = fuzz.trimf( forca, [-400, -200, 0])
+# FORCA['Zero']            = fuzz.trimf( forca, [-200, 0, 200])
+# FORCA['PoucoPositivo']   = fuzz.trimf( forca, [0, 200, 400])
+# FORCA['MedioPositivo']   = fuzz.trimf( forca, [200, 400, 600])
+# FORCA['MuitoPositivo']   = fuzz.trimf( forca, [400, 600, 800])
+# FORCA['ExtremoPositivo'] = fuzz.trapmf(forca, [600, 800, 1000, 1000])
+
+FORCA['ExtremoNegativo'] = fuzz.trapmf(forca, [-1000, -1000, -900, -600])
 FORCA['MuitoNegativo']   = fuzz.trimf( forca, [-800, -600, -400])
 FORCA['MedioNegativo']   = fuzz.trimf( forca, [-600, -400, -200])
-FORCA['PoucoNegativo']   = fuzz.trimf( forca, [-400, -200, 0])
-FORCA['Zero']            = fuzz.trimf( forca, [-200, 0, 200])
-FORCA['PoucoPositivo']   = fuzz.trimf( forca, [0, 200, 400])
+FORCA['PoucoNegativo']   = fuzz.trimf( forca, [-400, -200, -200])
+FORCA['Zero']            = fuzz.trimf( forca, [-100, 0, 100])
+FORCA['PoucoPositivo']   = fuzz.trimf( forca, [200, 200, 400])
 FORCA['MedioPositivo']   = fuzz.trimf( forca, [200, 400, 600])
 FORCA['MuitoPositivo']   = fuzz.trimf( forca, [400, 600, 800])
-FORCA['ExtremoPositivo'] = fuzz.trapmf(forca, [600, 800, 1000, 1000])
+FORCA['ExtremoPositivo'] = fuzz.trapmf(forca, [600, 900, 1000, 1000])
 
 #FORCA.view()
 
@@ -258,6 +281,16 @@ RegraX_4 = ctrl.Rule( X['Zero']              & X_P['Zero']    , FORCA['Zero'])
 RegraX_5 = ctrl.Rule( X['Zero']              & X_P['Positivo'], FORCA['Zero'])
 RegraX_6 = ctrl.Rule( X['PoucoPositivo']     & X_P['Positivo'], FORCA['Zero'])
 RegraX_7 = ctrl.Rule( X['MuitoPositivo']     & X_P['Positivo'], FORCA['ExtremoNegativo'])
+
+RegraX_8 = ctrl.Rule( X['PoucoNegativo']     & X_P['Positivo'], FORCA['Zero'])
+RegraX_9 = ctrl.Rule( X['PoucoPositivo']     & X_P['Negativo'], FORCA['Zero'])
+
+RegraF_1 = ctrl.Rule( X['Zero']              & THETA['Zero'],   FORCA['Zero'])
+RegraF_2 = ctrl.Rule( X['Zero'] & X_P['Zero'] & THETA['Zero'],  FORCA['Zero'])
+RegraF_3 = ctrl.Rule( X['PoucoPositivo'] & X_P['Positivo'] & THETA['Zero'], FORCA['Zero'])
+RegraF_4 = ctrl.Rule( X['PoucoNegativo'] & X_P['Negativo'] & THETA['Zero'], FORCA['Zero'])
+RegraF_5 = ctrl.Rule( X['PoucoPositivo'] & X_P['Negativo'] & THETA['Zero'], FORCA['Zero'])
+RegraF_6 = ctrl.Rule( X['PoucoNegativo'] & X_P['Positivo'] & THETA['Zero'], FORCA['Zero'])
 
 #REGRAS THETA/THETA_P
 RegraT_1 = ctrl.Rule( THETA['MuitoNegativo'] & THETA_P['MuitoNegativo'], FORCA['ExtremoNegativo'])
@@ -310,16 +343,16 @@ compilado_regras = ctrl.ControlSystem([
     RegraX_5, RegraT_5,
     RegraX_6, RegraT_6,
     RegraX_7, RegraT_7,
-              RegraT_8,
-              RegraT_9,
-              RegraT_10,
-              RegraT_11,
-              RegraT_12,
-              RegraT_13,
-              RegraT_14,
-              RegraT_15,
-              RegraT_16,
-              RegraT_17,
+    RegraX_8, RegraT_8,
+    RegraX_9, RegraT_9,
+    RegraF_1, RegraT_10,
+    RegraF_2, RegraT_11,
+    RegraF_3, RegraT_12,
+    RegraF_4, RegraT_13,
+    RegraF_3, RegraT_14,
+    RegraF_4, RegraT_15,
+    RegraF_5, RegraT_16,
+    RegraF_6, RegraT_17,
               RegraT_18,
               RegraT_19,
               RegraT_20,
@@ -356,7 +389,7 @@ def funcao_controle_2(sensores):
     ind_velocidade_angular = sensores[3]
 
     Controle.compute() #defuzzify_method = 'centroid'
-
+    
     acao = Controle.output['Força']*K_f
     ind_acao = acao
     
