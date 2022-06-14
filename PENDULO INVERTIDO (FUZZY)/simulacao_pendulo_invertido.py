@@ -250,12 +250,13 @@ FORCA['ExtremoPositivo'] = fuzz.trapmf(forca, [600, 800, 1000, 1000])
 #REGRAS X/X_P
 #Para as interpretações de posição a ação de controle é inversa à variação (erro)
 
+#O melhor até agora, dançando pouco no SP
 RegraX_1 = ctrl.Rule( X['MuitoNegativo']     & X_P['Negativo'], FORCA['ExtremoPositivo'])
-RegraX_2 = ctrl.Rule( X['PoucoNegativo']     & X_P['Negativo'], FORCA['MuitoPositivo'])
-RegraX_3 = ctrl.Rule( X['Zero']              & X_P['Negativo'], FORCA['MedioPositivo'])
+RegraX_2 = ctrl.Rule( X['PoucoNegativo']     & X_P['Negativo'], FORCA['Zero'])
+RegraX_3 = ctrl.Rule( X['Zero']              & X_P['Negativo'], FORCA['Zero'])
 RegraX_4 = ctrl.Rule( X['Zero']              & X_P['Zero']    , FORCA['Zero'])
-RegraX_5 = ctrl.Rule( X['Zero']              & X_P['Positivo'], FORCA['MedioNegativo'])
-RegraX_6 = ctrl.Rule( X['PoucoPositivo']     & X_P['Positivo'], FORCA['MuitoNegativo'])
+RegraX_5 = ctrl.Rule( X['Zero']              & X_P['Positivo'], FORCA['Zero'])
+RegraX_6 = ctrl.Rule( X['PoucoPositivo']     & X_P['Positivo'], FORCA['Zero'])
 RegraX_7 = ctrl.Rule( X['MuitoPositivo']     & X_P['Positivo'], FORCA['ExtremoNegativo'])
 
 #REGRAS THETA/THETA_P
