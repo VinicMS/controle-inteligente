@@ -213,31 +213,15 @@ K_velocidade_angular = 0.4
 
 K_f = 1.5
 
-#TÁ FUNCIONANDO
 X['MuitoNegativo'] = fuzz.trapmf(x, [-1, -1, -0.75,  -0.5])
 X['PoucoNegativo'] = fuzz.trimf( x, [-0.75, -0.325, -0])
 X['Zero']          = fuzz.trimf( x, [-0.4, 0.0, 0.4])
 X['PoucoPositivo'] = fuzz.trimf( x, [0, 0.325, 0.75])
 X['MuitoPositivo'] = fuzz.trapmf(x, [0.5, 0.75, 1, 1])
 
-#TA FUNCIONANDO
-# X_P['Negativo'] = fuzz.trimf(x_p, [-50, -47, -0])
-# X_P['Zero']     = fuzz.trimf(x_p, [-10, 0, 10])
-# X_P['Positivo'] = fuzz.trimf(x_p, [0, 47, 50])
-
-#tá bacana
 X_P['Negativo'] = fuzz.trimf(x_p, [-50, -47, 0])
 X_P['Zero']     = fuzz.trimf(x_p, [-0.1, 0, 0.1])
 X_P['Positivo'] = fuzz.trimf(x_p, [0, 47, 50])
-
-#TÁ FUNCIONANDO
-# THETA['MuitoNegativo'] = fuzz.trapmf(theta, [-1, -1, -0.75, -0.5])
-# THETA['MedioNegativo'] = fuzz.trimf( theta, [-0.75, -0.5, -0.25])
-# THETA['PoucoNegativo'] = fuzz.trimf( theta, [-0.50, -0.25, 0])
-# THETA['Zero']          = fuzz.trapmf(theta, [-0.2, -0.1, 0.1, 0.2])
-# THETA['PoucoPositivo'] = fuzz.trimf( theta, [0 , 0.25, 0.5])
-# THETA['MedioPositivo'] = fuzz.trimf( theta, [0.25, 0.5, 0.75])
-# THETA['MuitoPositivo'] = fuzz.trapmf(theta, [0.5, 0.75, 1, 1])
 
 THETA['MuitoNegativo'] = fuzz.trapmf(theta, [-1, -1, -0.75, -0.5])
 THETA['MedioNegativo'] = fuzz.trimf( theta, [-0.75, -0.5, -0.25])
@@ -247,23 +231,11 @@ THETA['PoucoPositivo'] = fuzz.trimf( theta, [0 , 0.25, 0.5])
 THETA['MedioPositivo'] = fuzz.trimf( theta, [0.25, 0.5, 0.75])
 THETA['MuitoPositivo'] = fuzz.trapmf(theta, [0.5, 0.75, 1, 1])
 
-#TÁ FUNCIONANDO
 THETA_P['MuitoNegativo'] = fuzz.trapmf(theta_p, [-20,-20,-12,-7])
 THETA_P['PoucoNegativo'] = fuzz.trimf( theta_p, [-8,-5,-2])
 THETA_P['Zero']          = fuzz.trimf( theta_p, [-3, 0, 3])
 THETA_P['PoucoPositivo'] = fuzz.trimf( theta_p, [2, 5, 8])
 THETA_P['MuitoPositivo'] = fuzz.trapmf(theta_p, [7,12,20,20])
-
-#TÁ FUNCIONDANDO
-# FORCA['ExtremoNegativo'] = fuzz.trapmf(forca, [-1000, -1000, -800, -600])
-# FORCA['MuitoNegativo']   = fuzz.trimf( forca, [-800, -600, -400])
-# FORCA['MedioNegativo']   = fuzz.trimf( forca, [-600, -400, -200])
-# FORCA['PoucoNegativo']   = fuzz.trimf( forca, [-400, -200, 0])
-# FORCA['Zero']            = fuzz.trimf( forca, [-200, 0, 200])
-# FORCA['PoucoPositivo']   = fuzz.trimf( forca, [0, 200, 400])
-# FORCA['MedioPositivo']   = fuzz.trimf( forca, [200, 400, 600])
-# FORCA['MuitoPositivo']   = fuzz.trimf( forca, [400, 600, 800])
-# FORCA['ExtremoPositivo'] = fuzz.trapmf(forca, [600, 800, 1000, 1000])
 
 FORCA['ExtremoNegativo'] = fuzz.trapmf(forca, [-1000, -1000, -900, -600])
 FORCA['MuitoNegativo']   = fuzz.trimf( forca, [-800, -600, -400])
@@ -280,7 +252,6 @@ FORCA['ExtremoPositivo'] = fuzz.trapmf(forca, [600, 900, 1000, 1000])
 #REGRAS X/X_P
 #Para as interpretações de posição a ação de controle é inversa à variação (erro)
 
-#O melhor até agora, dançando pouco no SP
 RegraX_1 = ctrl.Rule( X['MuitoNegativo']     & X_P['Negativo'], FORCA['ExtremoPositivo'])
 RegraX_2 = ctrl.Rule( X['PoucoNegativo']     & X_P['Negativo'], FORCA['PoucoPositivo'])
 RegraX_3 = ctrl.Rule( X['Zero']              & X_P['Negativo'], FORCA['PoucoPositivo'])
@@ -291,11 +262,11 @@ RegraX_7 = ctrl.Rule( X['MuitoPositivo']     & X_P['Positivo'], FORCA['ExtremoNe
 
 RegraX_8 = ctrl.Rule( X['PoucoNegativo']     & X_P['Positivo'], FORCA['PoucoPositivo'])
 RegraX_9 = ctrl.Rule( X['PoucoPositivo']     & X_P['Negativo'], FORCA['PoucoNegativo'])
-RegraX_10 = ctrl.Rule( X['PoucoNegativo']     & X_P['Zero'], FORCA['Zero'])
-RegraX_11 = ctrl.Rule( X['PoucoPositivo']     & X_P['Zero'], FORCA['Zero'])
+RegraX_10 = ctrl.Rule( X['PoucoNegativo']    & X_P['Zero'], FORCA['Zero'])
+RegraX_11 = ctrl.Rule( X['PoucoPositivo']    & X_P['Zero'], FORCA['Zero'])
 
-RegraF_1 = ctrl.Rule( X['Zero']              & THETA['Zero'],   FORCA['Zero'])
-RegraF_2 = ctrl.Rule( X['Zero'] & X_P['Zero'] & THETA['Zero'],  FORCA['Zero'])
+RegraF_1 = ctrl.Rule( X['Zero']                            & THETA['Zero'], FORCA['Zero'])
+RegraF_2 = ctrl.Rule( X['Zero']          & X_P['Zero']     & THETA['Zero'], FORCA['Zero'])
 RegraF_3 = ctrl.Rule( X['PoucoPositivo'] & X_P['Positivo'] & THETA['Zero'], FORCA['Zero'])
 RegraF_4 = ctrl.Rule( X['PoucoNegativo'] & X_P['Negativo'] & THETA['Zero'], FORCA['Zero'])
 RegraF_5 = ctrl.Rule( X['PoucoPositivo'] & X_P['Negativo'] & THETA['Zero'], FORCA['Zero'])
@@ -399,12 +370,12 @@ def funcao_controle_2(sensores):
 
     Controle.compute() #defuzzify_method = 'centroid'
     
-    if abs(posicao)<0.02 and abs(ind_velocidade)<0.01 and abs(ind_angulo)<0.001:
-        acao = 0
-    else:
-        acao = Controle.output['Força']*K_f
+    # if abs(posicao)<0.02 and abs(ind_velocidade)<0.01 and abs(ind_angulo)<0.001:
+    #     acao = 0
+    # else:
+    #     acao = Controle.output['Força']*K_f
 
-    #acao = Controle.output['Força']*K_f
+    acao = Controle.output['Força']*K_f
     
     ind_acao = acao
     
