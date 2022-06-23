@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun 23 11:07:20 2022
+
+@author: Lorena
+"""
+
 #ESSE TA FUNCIONANDO MAIS OU MENOS (TREMENDO NO SETPOINT)
 
 import pygame
@@ -200,11 +207,11 @@ FORCA = ctrl.Consequent(forca, 'Força', defuzzify_method='centroid')
 #defuzzify_method = 'lom'
 
 K_posicao = 70
-K_velocidade = 0.8
+K_velocidade = 0.9
 K_angulo = 0.8
-K_velocidade_angular = 1
+K_velocidade_angular = 0.4
 
-K_f = 2
+K_f = 1.5
 
 #TÁ FUNCIONANDO
 X['MuitoNegativo'] = fuzz.trapmf(x, [-1, -1, -0.75,  -0.5])
@@ -275,15 +282,17 @@ FORCA['ExtremoPositivo'] = fuzz.trapmf(forca, [600, 900, 1000, 1000])
 
 #O melhor até agora, dançando pouco no SP
 RegraX_1 = ctrl.Rule( X['MuitoNegativo']     & X_P['Negativo'], FORCA['ExtremoPositivo'])
-RegraX_2 = ctrl.Rule( X['PoucoNegativo']     & X_P['Negativo'], FORCA['Zero'])
-RegraX_3 = ctrl.Rule( X['Zero']              & X_P['Negativo'], FORCA['Zero'])
+RegraX_2 = ctrl.Rule( X['PoucoNegativo']     & X_P['Negativo'], FORCA['PoucoPositivo'])
+RegraX_3 = ctrl.Rule( X['Zero']              & X_P['Negativo'], FORCA['PoucoPositivo'])
 RegraX_4 = ctrl.Rule( X['Zero']              & X_P['Zero']    , FORCA['Zero'])
-RegraX_5 = ctrl.Rule( X['Zero']              & X_P['Positivo'], FORCA['Zero'])
-RegraX_6 = ctrl.Rule( X['PoucoPositivo']     & X_P['Positivo'], FORCA['Zero'])
+RegraX_5 = ctrl.Rule( X['Zero']              & X_P['Positivo'], FORCA['PoucoNegativo'])
+RegraX_6 = ctrl.Rule( X['PoucoPositivo']     & X_P['Positivo'], FORCA['PoucoNegativo'])
 RegraX_7 = ctrl.Rule( X['MuitoPositivo']     & X_P['Positivo'], FORCA['ExtremoNegativo'])
 
-RegraX_8 = ctrl.Rule( X['PoucoNegativo']     & X_P['Positivo'], FORCA['Zero'])
-RegraX_9 = ctrl.Rule( X['PoucoPositivo']     & X_P['Negativo'], FORCA['Zero'])
+RegraX_8 = ctrl.Rule( X['PoucoNegativo']     & X_P['Positivo'], FORCA['PoucoPositivo'])
+RegraX_9 = ctrl.Rule( X['PoucoPositivo']     & X_P['Negativo'], FORCA['PoucoNegativo'])
+RegraX_10 = ctrl.Rule( X['PoucoNegativo']     & X_P['Zero'], FORCA['Zero'])
+RegraX_11 = ctrl.Rule( X['PoucoPositivo']     & X_P['Zero'], FORCA['Zero'])
 
 RegraF_1 = ctrl.Rule( X['Zero']              & THETA['Zero'],   FORCA['Zero'])
 RegraF_2 = ctrl.Rule( X['Zero'] & X_P['Zero'] & THETA['Zero'],  FORCA['Zero'])
@@ -353,8 +362,8 @@ compilado_regras = ctrl.ControlSystem([
     RegraF_4, RegraT_15,
     RegraF_5, RegraT_16,
     RegraF_6, RegraT_17,
-              RegraT_18,
-              RegraT_19,
+    RegraX_10, RegraT_18,
+    RegraX_11, RegraT_19,
               RegraT_20,
               RegraT_21,
               RegraT_22,
@@ -390,7 +399,13 @@ def funcao_controle_2(sensores):
 
     Controle.compute() #defuzzify_method = 'centroid'
     
-    acao = Controle.output['Força']*K_f
+    if abs(posicao)<0.02 and abs(ind_velocidade)<0.01 and abs(ind_angulo)<0.001:
+        acao = 0
+    else:
+        acao = Controle.output['Força']*K_f
+
+    #acao = Controle.output['Força']*K_f
+    
     ind_acao = acao
     
     print("X: %.2f, X_P: %.2f, T: %.2f, T_P: %.2f C: %.2f" % 
@@ -417,6 +432,9 @@ def funcao_controle_3(sensores):
 # Cria o ambiente de simulação.
 env = InvertedPendulum(0.50)
 
+grafico_posicao = []
+grafico_acao = []
+
 # Reseta o ambiente de simulação.
 sensores = env.reset()
 
@@ -429,7 +447,13 @@ while True:
     # Calcula a ação de controle.
     acao = funcao_controle_2(sensores)  # É ESSA A FUNÇÃO QUE VOCÊS DEVEM PROJETAR.
     
+    grafico_posicao.append(env.xRef - sensores[0])
+    grafico_acao.append(acao)
+    
     # Aplica a ação de controle.
     sensores = env.step(acao)
     
 env.close()
+
+plt.plot(grafico_posicao)
+#plt.plot(grafico_acao)
