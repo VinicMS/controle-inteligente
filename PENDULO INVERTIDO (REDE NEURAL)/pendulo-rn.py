@@ -1,7 +1,12 @@
 import pygame
 import numpy as np
-from scipy import linalg
+import joblib
+from sklearn.neural_network import MLPRegressor
 
+import matplotlib.pyplot as plt
+
+arquivo_rede = "modelos/tr13"
+rede_carregada = joblib.load(arquivo_rede)
 
 class InvertedPendulum():
     # Initialize environment.
@@ -85,10 +90,10 @@ class InvertedPendulum():
             
             if (event.type == pygame.KEYDOWN):
                 if (event.key == pygame.K_LEFT):
-                    self.xRef -= 0.3
+                    self.xRef -= 0.01
                     
                 elif (event.key == pygame.K_RIGHT):
-                    self.xRef += 0.3
+                    self.xRef += 0.01
                     
                 elif (event.key == pygame.K_SPACE):
                     self.step(200*np.random.randn())
@@ -137,8 +142,6 @@ class InvertedPendulum():
         else:
             return self.observation.copy()
         
-
-
 # Parâmetros do sistema.
 g = 9.8
 M = 1.0
@@ -147,8 +150,6 @@ l = 0.5
 L = 2*l
 I = m*L**2 / 12
 
-
-
 # SENSORES.
 # sensores[0]: posição.
 # sensores[1]: velocidade.
@@ -156,47 +157,42 @@ I = m*L**2 / 12
 # sensores[3]: velocidade angular.
 # SETPOINT em env.xRef.
 
+inputs_rede = np.zeros(4)
 
+#5, 2, 1, 0.5, 1 #primeiro que deu certo (oscilando bastante)
+#5, 1.5, 1, 0.5, 1.5 #oscilando entre -0.2 e +0.2
+#5, 1.4, 1, 0.4, 1.3 #oscilando um pouco (menos que 0.2)
+#60, 1.5, 0.9, 0.5, 1.7
 
-# Função de controle: Ação nula.
-def funcao_controle_1(sensores):
-    
-    #Polos com estabilidade fina para o disturbio com polos em p = (-80, -165, -1.5, -2) no Matlab
-    K = np.array([-2761, -3273, -11460, -2352])
-    
-    #Polos com estabilidade fina para o disturbio com polos em P = [-4, -3.9719+j,-3.9719-j,-3.9719] no Matlab
-    #Próximo do limiar de instabilidade (polos exatos com deslocamento no plano complexo)
-    #K = np.array([-18.5846, -18.1254, -88.7634, -22.9593])
-                                                                                 
-    #ganhos obtidos com os polos estipulados por análise da reação ao degrau
-    K = K*(-1)#operação da fórmula
-    
-    acao = np.array(((sensores[0]-env.xRef)*K[0]+sensores[1]*K[1]+sensores[2]*K[2]+sensores[3]*K[3]))
-    
-    return acao
+K_posicao            = 5
+K_velocidade         = 1.4
+K_angulo             = 1
+K_velocidade_angular = 0.4
 
+K_f                  = 1.3
 
-# Função de controle.
-def funcao_controle_2(sensores):
-    # Controle aleatório.
-    acao = 2*np.random.randn() - 1
-    return acao
-
-                
 # Função de controle.
 def funcao_controle_3(sensores):
-    # Controle intuitivo.
-    # Obtém valor do ângulo.
-    angulo = sensores[2]
-    if (angulo > 0):
-        acao = +1.0
-    # Se o pêndulo está caindo para a esquerda, movemos o carro para a esquerda.
-    else:
-        acao = -1.0
+    
+    inputs_rede[0] = (env.xRef - sensores[0])*K_posicao
+    inputs_rede[1] = (sensores[1])*K_velocidade
+    inputs_rede[2] = (sensores[2])*K_angulo
+    inputs_rede[3] = (sensores[3])*K_velocidade_angular
+    
+    saida_pred = (rede_carregada.predict([inputs_rede]))*K_f
+    
+    acao = saida_pred
+
+    print("X: %.2f, X_P: %.2f, T: %.2f, T_P: %.2f C: %.2f" % 
+        (env.xRef-sensores[0], sensores[1], sensores[2], sensores[3], acao))
+
     return acao
 
 # Cria o ambiente de simulação.
-env = InvertedPendulum(0.50)
+env = InvertedPendulum(0.3)
+
+grafico_posicao = []
+grafico_acao = []
 
 # Reseta o ambiente de simulação.
 sensores = env.reset()
@@ -208,9 +204,24 @@ while True:
         break
     
     # Calcula a ação de controle.
-    acao = funcao_controle_1(sensores)  # É ESSA A FUNÇÃO QUE VOCÊS DEVEM PROJETAR.
+    acao = funcao_controle_3(sensores)  # É ESSA A FUNÇÃO QUE VOCÊS DEVEM PROJETAR.
+    
+    grafico_posicao.append(env.xRef - sensores[0])
+    grafico_acao.append(acao)
     
     # Aplica a ação de controle.
     sensores = env.step(acao)
     
 env.close()
+
+#EXIBICAO DO GRAFICO
+plt.figure(1, figsize=(20, 10))
+plt.subplot(1,2,1)
+plt.ylim([-1, 1])
+plt.grid()
+plt.plot(grafico_posicao)
+plt.title("Erro posicao")
+plt.subplot(1,2,2)
+plt.plot(grafico_acao)
+plt.title("Acao de controle")
+plt.grid()

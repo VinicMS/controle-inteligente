@@ -1,17 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 23 11:07:20 2022
-
-@author: Lorena
-"""
-
 #ESSE TA FUNCIONANDO MAIS OU MENOS (TREMENDO NO SETPOINT)
 
 import pygame
 import numpy as np
-from scipy import linalg
+import pandas as pd
+from scipy import linalg    
 
-from skfuzzy import control as ctrl, defuzz
+from skfuzzy import control as ctrl
 import skfuzzy as fuzz
 import matplotlib.pyplot as plt
 
@@ -94,6 +88,9 @@ class InvertedPendulum():
             if (event.type == pygame.QUIT):
                 pygame.quit()
                 self.finish = True
+
+                tabelaDf.to_csv('dados.csv', index=False, header=None)
+
                 return None
             
             if (event.type == pygame.KEYDOWN):
@@ -329,12 +326,12 @@ compilado_regras = ctrl.ControlSystem([
     RegraF_2, RegraT_11,
     RegraF_3, RegraT_12,
     RegraF_4, RegraT_13,
-    RegraF_3, RegraT_14,
-    RegraF_4, RegraT_15,
-    RegraF_5, RegraT_16,
-    RegraF_6, RegraT_17,
-    RegraX_10, RegraT_18,
-    RegraX_11, RegraT_19,
+    RegraF_5, RegraT_14,
+    RegraF_6, RegraT_15,
+    RegraX_10,RegraT_16,
+    RegraX_11,RegraT_17,
+              RegraT_18,
+              RegraT_19,
               RegraT_20,
               RegraT_21,
               RegraT_22,
@@ -409,6 +406,10 @@ grafico_acao = []
 # Reseta o ambiente de simulação.
 sensores = env.reset()
 
+tabela = [(0, 0, 0, 0, 0)]
+tabelaDf = pd.DataFrame(tabela)
+k = 0
+
 while True:
     # Renderiza o simulador.
     env.render()
@@ -423,6 +424,9 @@ while True:
     
     # Aplica a ação de controle.
     sensores = env.step(acao)
+
+    tabelaDf.loc[k] = [env.xRef-sensores[0], sensores[1], sensores[2], sensores[3], acao]
+    k = k + 1
     
 env.close()
 
