@@ -5,7 +5,7 @@ from sklearn.neural_network import MLPRegressor
 
 import matplotlib.pyplot as plt
 
-arquivo_rede = "modelos/tr9"
+arquivo_rede = "modelos/baseado em ss/modelo_espaco_estados"
 rede_carregada = joblib.load(arquivo_rede)
 
 class InvertedPendulum():
