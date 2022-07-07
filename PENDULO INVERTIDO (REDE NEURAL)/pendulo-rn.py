@@ -5,7 +5,7 @@ from sklearn.neural_network import MLPRegressor
 
 import matplotlib.pyplot as plt
 
-arquivo_rede = "modelos/tr8"
+arquivo_rede = "modelos/tr9"
 rede_carregada = joblib.load(arquivo_rede)
 
 class InvertedPendulum():
@@ -164,17 +164,20 @@ inputs_rede = np.zeros(4)
 #5, 1.4, 1, 0.4, 1.3 #oscilando um pouco (menos que 0.2)
 #60, 1.5, 0.9, 0.5, 1.7
 
-K_posicao            = 1
-K_velocidade         = 1
-K_angulo             = 1
-K_velocidade_angular = 1
+K_p = 200
+
+K_posicao            = 15   * K_p #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
+K_velocidade         = 7.5  * K_p
+K_angulo             = 30   * K_p
+K_velocidade_angular = 7.5  * K_p
 
 K_f                  = 1
+
 
 # Função de controle.
 def funcao_controle_3(sensores):
     
-    inputs_rede[0] = (env.xRef - sensores[0])*K_posicao
+    inputs_rede[0] = (env.xRef - sensores[0] + 0.0122)*K_posicao
     inputs_rede[1] = (sensores[1])*K_velocidade
     inputs_rede[2] = (sensores[2])*K_angulo
     inputs_rede[3] = (sensores[3])*K_velocidade_angular
@@ -183,15 +186,18 @@ def funcao_controle_3(sensores):
     
     acao = saida_pred
 
-    print("X: %.2f, X_P: %.2f, T: %.2f, T_P: %.2f C: %.2f" % 
+    print("X: %.4f, X_P: %.4f, T: %.4f, T_P: %.4f C: %.4f" % 
         (env.xRef-sensores[0], sensores[1], sensores[2], sensores[3], acao))
 
     return acao
 
 # Cria o ambiente de simulação.
-env = InvertedPendulum(0.3)
+env = InvertedPendulum(0.5)
 
 grafico_posicao = []
+grafico_velocidade = []
+grafico_angulo = []
+grafico_velocidade_angular = []
 grafico_acao = []
 
 # Reseta o ambiente de simulação.
@@ -207,7 +213,11 @@ while True:
     acao = funcao_controle_3(sensores)  # É ESSA A FUNÇÃO QUE VOCÊS DEVEM PROJETAR.
     
     grafico_posicao.append(env.xRef - sensores[0])
+    grafico_velocidade.append(sensores[1])
+    grafico_angulo.append(sensores[2])
+    grafico_velocidade_angular.append(sensores[3])
     grafico_acao.append(acao)
+    
     
     # Aplica a ação de controle.
     sensores = env.step(acao)
@@ -216,13 +226,25 @@ env.close()
 
 #EXIBICAO DO GRAFICO
 plt.figure(1, figsize=(20, 10))
-plt.subplot(1,2,1)
+plt.subplot(3,1,1)
 plt.ylim([-1, 1])
 plt.grid()
-plt.plot(grafico_posicao)
-plt.title("Erro posicao")
-plt.subplot(1,2,2)
-plt.plot(grafico_acao)
-plt.title("Acao de controle")
+plt.plot(grafico_posicao, label = "$x$ (Posição)")
+plt.plot(grafico_angulo,  label = "$\\theta$ (Ângulo)")
+plt.legend()
+plt.title("Erros primários")
+
+plt.subplot(3,1,2)
+# plt.ylim([-1, 1])
 plt.grid()
-# plt.show()
+plt.plot(grafico_velocidade, label = "$\dot{x}$ (Velocidade)")
+plt.plot(grafico_velocidade_angular,  label = "$\dot{\\theta}$ (Velocidade angular)")
+plt.legend()
+plt.title("Erros derivados")
+
+plt.subplot(3,1,3)
+plt.plot(grafico_acao, label = "$u$ (Ação de controle)")
+plt.legend()
+plt.title("Controle")
+plt.grid()
+plt.show()
