@@ -9,10 +9,9 @@ from skfuzzy import control as ctrl
 import skfuzzy as fuzz
 import matplotlib.pyplot as plt
 
-
 class InvertedPendulum():
     # Initialize environment.
-    def __init__(self, xRef = 0.0, randomParameters = False, randomSensor = False, randomActuator = False):
+    def __init__(self, xRef = 0.0, randomParameters = False, randomSensor = True, randomActuator = False):
         # System parameters.
         self.tau = 0.01
         if not randomParameters:
@@ -89,7 +88,7 @@ class InvertedPendulum():
                 pygame.quit()
                 self.finish = True
 
-                tabelaDf.to_csv('dados.csv', index=False, header=None)
+                tabelaDf.to_csv('dados_gerados.csv', index=False, header=None)
 
                 return None
             
@@ -166,7 +165,7 @@ I = m*L**2 / 12
 def funcao_controle_1(sensores):
     
     #Polos com estabilidade fina para o disturbio com polos em p = (-80, -165, -1.5, -2) no Matlab
-    K = np.array([-2761, -3273, -11460, -2352])
+    K = np.array([-2761, -3273, -11460, -2352]) #convertido em ganhos separados pra gerar a massa de dados para a rede neural (criar o conjunto dos estados finais, com ganhos que foram sentidos pra atuar)
     
     #Polos com estabilidade fina para o disturbio com polos em P = [-4, -3.9719+j,-3.9719-j,-3.9719] no Matlab
     #Próximo do limiar de instabilidade (polos exatos com deslocamento no plano complexo)
@@ -175,8 +174,14 @@ def funcao_controle_1(sensores):
     #ganhos obtidos com os polos estipulados por análise da reação ao degrau
     K = K*(-1)#operação da fórmula
     
-    acao = np.array(((sensores[0]-env.xRef)*K[0]+sensores[1]*K[1]+sensores[2]*K[2]+sensores[3]*K[3]))
-    
+    acao = np.array(((sensores[0]-env.xRef) * K_posicao    + 
+                      sensores[1]           * K_velocidade + 
+                      sensores[2]           * K_angulo     + 
+                      sensores[3]           * K_velocidade_angular))
+
+    #acao = np.array(((sensores[0]-env.xRef)*K[0] + sensores[1]*K[1] + sensores[2]*K[2] + sensores[3]*K[3]))                  
+    #acao = np.array(((sensores[0]-env.xRef)*K[0]+sensores[1]*K[1]+sensores[2]*K[2]+sensores[3]*K[3]))
+
     print("X: %.2f, X_P: %.2f, T: %.2f, T_P: %.2f C: %.2f" % 
         (env.xRef-sensores[0], sensores[1], sensores[2], sensores[3], acao))
 
@@ -202,13 +207,6 @@ FORCA = ctrl.Consequent(forca, 'Força', defuzzify_method='centroid')
 #defuzzify_method = 'mom'
 #defuzzify_method = 'som'
 #defuzzify_method = 'lom'
-
-K_posicao = 70
-K_velocidade = 0.9
-K_angulo = 0.8
-K_velocidade_angular = 0.4
-
-K_f = 1.5
 
 X['MuitoNegativo'] = fuzz.trapmf(x, [-1, -1, -0.75,  -0.5])
 X['PoucoNegativo'] = fuzz.trimf( x, [-0.75, -0.325, -0])
@@ -354,15 +352,16 @@ Controle = ctrl.ControlSystemSimulation(compilado_regras)
 # Função de controle Fuzzy.
 
 def funcao_controle_2(sensores):
+
     posicao = env.xRef - sensores[0]
 
-    Controle.input['Posição'] = posicao*K_posicao
+    Controle.input['Posição'] = posicao * K_posicao
     ind_posicao = posicao
-    Controle.input['Velocidade'] = sensores[1]*K_velocidade
+    Controle.input['Velocidade'] = sensores[1] * K_velocidade
     ind_velocidade = sensores[1]
-    Controle.input['Angulo'] = sensores[2]*K_angulo
+    Controle.input['Angulo'] = sensores[2] * K_angulo
     ind_angulo = sensores[2]
-    Controle.input['Velocidade Angular'] = sensores[3]*K_velocidade_angular
+    Controle.input['Velocidade Angular'] = sensores[3] * K_velocidade_angular
     ind_velocidade_angular = sensores[3]
 
     Controle.compute() #defuzzify_method = 'centroid'
@@ -372,7 +371,7 @@ def funcao_controle_2(sensores):
     # else:
     #     acao = Controle.output['Força']*K_f
 
-    acao = Controle.output['Força']*K_f
+    acao = Controle.output['Força'] * K_f
     
     ind_acao = acao
     
@@ -398,7 +397,22 @@ def funcao_controle_3(sensores):
     return acao
 
 # Cria o ambiente de simulação.
-env = InvertedPendulum(0.50)
+#ss
+K_posicao = 2761 #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
+K_velocidade = 3273
+K_angulo = 11460
+K_velocidade_angular = 2352
+K_f = 1
+
+# #fuzzy
+# K_posicao = 70
+# K_velocidade = 0.9
+# K_angulo = 0.8
+# K_velocidade_angular = 0.4
+
+# K_f = 1.5
+
+env = InvertedPendulum(0.0)
 
 grafico_posicao = []
 grafico_acao = []
@@ -417,7 +431,7 @@ while True:
         break
     
     # Calcula a ação de controle.
-    acao = funcao_controle_2(sensores)  # É ESSA A FUNÇÃO QUE VOCÊS DEVEM PROJETAR.
+    acao = funcao_controle_1(sensores)  # É ESSA A FUNÇÃO QUE VOCÊS DEVEM PROJETAR.
     
     grafico_posicao.append(env.xRef - sensores[0])
     grafico_acao.append(acao)
@@ -425,7 +439,15 @@ while True:
     # Aplica a ação de controle.
     sensores = env.step(acao)
 
-    tabelaDf.loc[k] = [env.xRef-sensores[0], sensores[1], sensores[2], sensores[3], acao]
+    #preenchimento do .csv com o comportamento do outro controlador (fuzzy ou ss)
+    tabelaDf.loc[k] = [(env.xRef-sensores[0])* K_posicao, 
+                       (sensores[1])         * K_velocidade, 
+                       (sensores[2])         * K_angulo, 
+                       (sensores[3])         * K_velocidade_angular, 
+                       (acao)                * K_f]
+
+    print(K_posicao, K_velocidade, K_angulo, K_velocidade_angular, K_f)
+
     k = k + 1
     
 env.close()

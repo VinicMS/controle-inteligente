@@ -5,7 +5,7 @@ from sklearn.neural_network import MLPRegressor
 
 import matplotlib.pyplot as plt
 
-arquivo_rede = "modelos/tr13"
+arquivo_rede = "modelos/tr8"
 rede_carregada = joblib.load(arquivo_rede)
 
 class InvertedPendulum():
@@ -164,12 +164,12 @@ inputs_rede = np.zeros(4)
 #5, 1.4, 1, 0.4, 1.3 #oscilando um pouco (menos que 0.2)
 #60, 1.5, 0.9, 0.5, 1.7
 
-K_posicao            = 5
-K_velocidade         = 1.4
+K_posicao            = 1
+K_velocidade         = 1
 K_angulo             = 1
-K_velocidade_angular = 0.4
+K_velocidade_angular = 1
 
-K_f                  = 1.3
+K_f                  = 1
 
 # Função de controle.
 def funcao_controle_3(sensores):
@@ -225,3 +225,4 @@ plt.subplot(1,2,2)
 plt.plot(grafico_acao)
 plt.title("Acao de controle")
 plt.grid()
+# plt.show()
