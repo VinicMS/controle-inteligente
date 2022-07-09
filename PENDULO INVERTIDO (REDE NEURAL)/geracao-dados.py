@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 class InvertedPendulum():
     # Initialize environment.
-    def __init__(self, xRef = 0.0, randomParameters = False, randomSensor = True, randomActuator = False):
+    def __init__(self, xRef = 0.0, randomParameters = False, randomSensor = True, randomActuator = True):
         # System parameters.
         self.tau = 0.01
         if not randomParameters:
@@ -412,7 +412,7 @@ K_f = 1
 
 # K_f = 1.5
 
-env = InvertedPendulum(0.0)
+env = InvertedPendulum(-0.6)
 
 grafico_posicao = []
 grafico_acao = []
@@ -440,11 +440,17 @@ while True:
     sensores = env.step(acao)
 
     #preenchimento do .csv com o comportamento do outro controlador (fuzzy ou ss)
-    tabelaDf.loc[k] = [(env.xRef-sensores[0])* K_posicao, 
-                       (sensores[1])         * K_velocidade, 
-                       (sensores[2])         * K_angulo, 
-                       (sensores[3])         * K_velocidade_angular, 
-                       (acao)                * K_f]
+    # tabelaDf.loc[k] = [(env.xRef-sensores[0])* K_posicao, 
+    #                    (sensores[1])         * K_velocidade, 
+    #                    (sensores[2])         * K_angulo, 
+    #                    (sensores[3])         * K_velocidade_angular, 
+    #                    (acao)                * K_f]
+    
+    tabelaDf.loc[k] = [(env.xRef-sensores[0]), 
+                       (sensores[1])         , 
+                       (sensores[2])         , 
+                       (sensores[3])         , 
+                       (acao)                ]
 
     print(K_posicao, K_velocidade, K_angulo, K_velocidade_angular, K_f)
 

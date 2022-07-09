@@ -5,9 +5,6 @@ from sklearn.neural_network import MLPRegressor
 
 import matplotlib.pyplot as plt
 
-arquivo_rede = "modelos/baseado em ss/modelo_espaco_estados"
-rede_carregada = joblib.load(arquivo_rede)
-
 class InvertedPendulum():
     # Initialize environment.
     def __init__(self, xRef = 0.0, randomParameters = False, randomSensor = False, randomActuator = False):
@@ -164,25 +161,49 @@ inputs_rede = np.zeros(4)
 #5, 1.4, 1, 0.4, 1.3 #oscilando um pouco (menos que 0.2)
 #60, 1.5, 0.9, 0.5, 1.7
 
-K_p = 200
+#comportamento que funciona com treinamento/atuacao sendo multiplicada por ganhos
 
-K_posicao            = 15   * K_p #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
-K_velocidade         = 7.5  * K_p
-K_angulo             = 30   * K_p
-K_velocidade_angular = 7.5  * K_p
+# arquivo_rede = "modelos/baseado em ss/modelo_espaco_estados"
+# rede_carregada = joblib.load(arquivo_rede)
 
-K_f                  = 1
+# K_p = 200
 
+# K_posicao            = 15   * K_p #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
+# K_velocidade         = 7.5  * K_p
+# K_angulo             = 30   * K_p
+# K_velocidade_angular = 7.5  * K_p
+
+# K_f                  = 1
+
+# # Função de controle.
+# def funcao_controle_3(sensores):
+    
+#     inputs_rede[0] = (env.xRef - sensores[0] + 0.0122)*K_posicao
+#     inputs_rede[1] = (sensores[1])*K_velocidade
+#     inputs_rede[2] = (sensores[2])*K_angulo
+#     inputs_rede[3] = (sensores[3])*K_velocidade_angular
+    
+#     saida_pred = (rede_carregada.predict([inputs_rede]))*K_f
+    
+#     acao = saida_pred
+
+#     print("X: %.4f, X_P: %.4f, T: %.4f, T_P: %.4f C: %.4f" % 
+#         (env.xRef-sensores[0], sensores[1], sensores[2], sensores[3], acao))
+
+#     return acao
+
+arquivo_rede = "modelos/tr5"
+rede_carregada = joblib.load(arquivo_rede)
 
 # Função de controle.
 def funcao_controle_3(sensores):
     
-    inputs_rede[0] = (env.xRef - sensores[0] + 0.0122)*K_posicao
-    inputs_rede[1] = (sensores[1])*K_velocidade
-    inputs_rede[2] = (sensores[2])*K_angulo
-    inputs_rede[3] = (sensores[3])*K_velocidade_angular
+    inputs_rede[0] = (env.xRef - sensores[0])
+    inputs_rede[1] = (sensores[1])
+    inputs_rede[2] = (sensores[2])
+    inputs_rede[3] = (sensores[3])
     
-    saida_pred = (rede_carregada.predict([inputs_rede]))*K_f
+    saida_pred = (rede_carregada.predict([inputs_rede]))
     
     acao = saida_pred
 
@@ -227,7 +248,7 @@ env.close()
 #EXIBICAO DO GRAFICO
 plt.figure(1, figsize=(20, 10))
 plt.subplot(3,1,1)
-plt.ylim([-1, 1])
+# plt.ylim([-1, 1])
 plt.grid()
 plt.plot(grafico_posicao, label = "$x$ (Posição)")
 plt.plot(grafico_angulo,  label = "$\\theta$ (Ângulo)")
@@ -248,3 +269,4 @@ plt.legend()
 plt.title("Controle")
 plt.grid()
 plt.show()
+

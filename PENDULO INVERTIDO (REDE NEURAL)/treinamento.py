@@ -17,7 +17,7 @@ titulos_coleta = np.array([
 ])
 
 dataframe = pd.read_csv(
-    'dados/ss/dados_ss_randomSensor.csv',
+    'dados/ss/dados_ss_randomSensor_randomActuator_noGain.csv',
     header = None,
     names = titulos_coleta)
 
@@ -39,7 +39,7 @@ entradas_train, entradas_test, saida_train, saida_test = train_test_split(
 #learning_rate = 'adaptative'
 
 modelo = MLPRegressor(
-    hidden_layer_sizes = [4, 4, 2, 1],
+    hidden_layer_sizes = [4, 4, 1],
     activation='relu',
     #batch_size = 1000,
     max_iter = 100000,
