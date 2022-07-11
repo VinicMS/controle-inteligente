@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 class InvertedPendulum():
     # Initialize environment.
-    def __init__(self, xRef = 0.0, randomParameters = False, randomSensor = True, randomActuator = True):
+    def __init__(self, xRef = 0.0, randomParameters = False, randomSensor = False, randomActuator = False):
         # System parameters.
         self.tau = 0.01
         if not randomParameters:
@@ -94,10 +94,10 @@ class InvertedPendulum():
             
             if (event.type == pygame.KEYDOWN):
                 if (event.key == pygame.K_LEFT):
-                    self.xRef -= 0.01
+                    self.xRef -= 0.1
                     
                 elif (event.key == pygame.K_RIGHT):
-                    self.xRef += 0.01
+                    self.xRef += 0.1
                     
                 elif (event.key == pygame.K_SPACE):
                     self.step(200*np.random.randn())
@@ -398,10 +398,16 @@ def funcao_controle_3(sensores):
 
 # Cria o ambiente de simulação.
 #ss
-K_posicao = 2761 #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
-K_velocidade = 3273
-K_angulo = 11460
-K_velocidade_angular = 2352
+# K_posicao = 2761 #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
+# K_velocidade = 3273
+# K_angulo = 11460x
+# K_velocidade_angular = 2352
+# K_f = 1
+
+K_posicao = 100 #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
+K_velocidade = 50
+K_angulo = 200
+K_velocidade_angular = 50
 K_f = 1
 
 # #fuzzy
@@ -412,7 +418,7 @@ K_f = 1
 
 # K_f = 1.5
 
-env = InvertedPendulum(-0.6)
+env = InvertedPendulum(-0.3)
 
 grafico_posicao = []
 grafico_acao = []

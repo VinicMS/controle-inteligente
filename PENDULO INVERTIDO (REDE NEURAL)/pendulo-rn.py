@@ -166,12 +166,12 @@ inputs_rede = np.zeros(4)
 # arquivo_rede = "modelos/baseado em ss/modelo_espaco_estados"
 # rede_carregada = joblib.load(arquivo_rede)
 
-# K_p = 200
+# K_p = 1
 
-# K_posicao            = 15   * K_p #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
-# K_velocidade         = 7.5  * K_p
-# K_angulo             = 30   * K_p
-# K_velocidade_angular = 7.5  * K_p
+# K_posicao            = 10   * K_p #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
+# K_velocidade         = 5  * K_p
+# K_angulo             = 20   * K_p
+# K_velocidade_angular = 5  * K_p
 
 # K_f                  = 1
 
@@ -190,9 +190,9 @@ inputs_rede = np.zeros(4)
 #     print("X: %.4f, X_P: %.4f, T: %.4f, T_P: %.4f C: %.4f" % 
 #         (env.xRef-sensores[0], sensores[1], sensores[2], sensores[3], acao))
 
-#     return acao
+    # return acao
 
-arquivo_rede = "modelos/tr5"
+arquivo_rede = "modelos/tr4"
 rede_carregada = joblib.load(arquivo_rede)
 
 # Função de controle.

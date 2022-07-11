@@ -17,7 +17,7 @@ titulos_coleta = np.array([
 ])
 
 dataframe = pd.read_csv(
-    'dados/ss/dados_ss_randomSensor_randomActuator_noGain.csv',
+    'dados/dados_gerados.csv',
     header = None,
     names = titulos_coleta)
 
@@ -39,14 +39,14 @@ entradas_train, entradas_test, saida_train, saida_test = train_test_split(
 #learning_rate = 'adaptative'
 
 modelo = MLPRegressor(
-    hidden_layer_sizes = [4, 4, 1],
+    hidden_layer_sizes = [64, 32, 1],
     activation='relu',
     #batch_size = 1000,
     max_iter = 100000,
     solver='adam',
     verbose = True,
     learning_rate = 'constant',
-    #tol = 0.00001,
+    # tol = 0.00001,
     n_iter_no_change = 50,
     shuffle = True
 )
@@ -80,7 +80,7 @@ plt.figure(1, figsize=(10, 10))
 plt.scatter(saida_pred, saida_test)
 plt.plot(saida_pred, saida_pred, color="red")
 plt.title("Modelo " + str(identificador_arquivo))
-plt.xlim([-2000, 2000])
-plt.ylim([-2000, 2000])
+# plt.xlim([-2000, 2000])
+# plt.ylim([-2000, 2000])
 plt.grid()
 plt.show()
