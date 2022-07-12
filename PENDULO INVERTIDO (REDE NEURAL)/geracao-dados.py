@@ -419,7 +419,7 @@ K_f = 1
 
 # K_f = 1.5
 
-env = InvertedPendulum(-1.2)
+env = InvertedPendulum(1.5)
 
 grafico_posicao = []
 grafico_acao = []

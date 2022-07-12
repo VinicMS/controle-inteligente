@@ -32,13 +32,13 @@ entradas_train, entradas_test, saida_train, saida_test = train_test_split(
 modelo = MLPRegressor(
     hidden_layer_sizes = [1],
     activation='relu',
-    #batch_size = 1000,
+    batch_size = 500, #batch_size=min(200, n_samples), 200.
     max_iter = 100000,
     solver='adam',
     verbose = True,
     learning_rate = 'constant',
-    # tol = 0.00001,
-    n_iter_no_change = 20,
+    tol = 0.00001,
+    n_iter_no_change = 50,
     shuffle = True
 )
 
