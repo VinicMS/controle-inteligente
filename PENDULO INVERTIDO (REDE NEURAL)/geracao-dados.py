@@ -404,10 +404,11 @@ def funcao_controle_3(sensores):
 # K_velocidade_angular = 2352
 # K_f = 1
 
-K_posicao = 100 #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
-K_velocidade = 50
-K_angulo = 200
-K_velocidade_angular = 50
+#ordem de reducao: 15
+K_posicao = 250 #no inicio era negativo pois estava sensores[0]-env.xRef (pra poder manter tudo negativo nos ganhos), ai multiplica tudo por -1 e fica tudo positivo
+K_velocidade = 125
+K_angulo = 500
+K_velocidade_angular = 125
 K_f = 1
 
 # #fuzzy
@@ -418,7 +419,7 @@ K_f = 1
 
 # K_f = 1.5
 
-env = InvertedPendulum(-0.3)
+env = InvertedPendulum(-1.2)
 
 grafico_posicao = []
 grafico_acao = []

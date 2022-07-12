@@ -192,7 +192,7 @@ inputs_rede = np.zeros(4)
 
     # return acao
 
-arquivo_rede = "modelos/tr4"
+arquivo_rede = "modelos/tr37"
 rede_carregada = joblib.load(arquivo_rede)
 
 # Função de controle.
@@ -213,7 +213,7 @@ def funcao_controle_3(sensores):
     return acao
 
 # Cria o ambiente de simulação.
-env = InvertedPendulum(0.5)
+env = InvertedPendulum(0.7)
 
 grafico_posicao = []
 grafico_velocidade = []
